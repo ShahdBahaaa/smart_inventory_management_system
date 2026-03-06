@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SmartInventoryManagementSystem.API.Filters;
 using SmartInventoryManagementSystem.Application.DTOs;
 using SmartInventoryManagementSystem.Application.Services;
 using SmartInventoryManagementSystem.Domain.Entities;
@@ -55,6 +56,7 @@ namespace SmartInventoryManagementSystem.API.Controllers
         }
 
         [HttpPost("register")]
+        [AuthorizeRoles(UserRole.ADMIN)]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
