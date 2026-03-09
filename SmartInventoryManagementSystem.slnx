@@ -1,6 +1,7 @@
 <Solution>
+  <Project Path="SmartInventoryManagementSystem.API/SmartInventoryManagementSystem.API.csproj" />
   <Project Path="SmartInventoryManagementSystem.Application/SmartInventoryManagementSystem.Application.csproj" Id="ed435f06-dd72-4c83-b715-cf452ce3d096" />
   <Project Path="SmartInventoryManagementSystem.Domain/SmartInventoryManagementSystem.Domain.csproj" Id="908ca426-9fde-468d-8519-6981cc7ab85d" />
   <Project Path="SmartInventoryManagementSystem.Infrastructure/SmartInventoryManagementSystem.Infrastructure.csproj" Id="6ea3f021-613f-427b-8c42-05f0b30dd0ec" />
-  <Project Path="SmartInventoryManagementSystem/SmartInventoryManagementSystem.API.csproj" />
+  <Project Path="SmartInventoryManagementSystem.Tests/SmartInventoryManagementSystem.Tests.csproj" Id="486ce9d2-e637-4886-9a69-1dcfb93b0d8c" />
 </Solution>

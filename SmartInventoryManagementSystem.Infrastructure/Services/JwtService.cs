@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using SmartInventoryManagementSystem.Application.Services;
+using SmartInventoryManagementSystem.Application.Interfaces;
 using SmartInventoryManagementSystem.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -30,7 +30,7 @@ namespace SmartInventoryManagementSystem.Infrastructure.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                new Claim("id", user.UserID.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),

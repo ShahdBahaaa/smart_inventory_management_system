@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartInventoryManagementSystem.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SmartInventoryManagementSystem.Infrastructure.Data;
 namespace SmartInventoryManagementSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308132207_AddIsDeletedToUsers")]
+    partial class AddIsDeletedToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -612,19 +615,6 @@ namespace SmartInventoryManagementSystem.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            UserID = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@test.com",
-                            IsDeleted = false,
-                            Name = "Admin",
-                            PasswordHash = "$2a$11$7YFvH0nM8bCqzYbW0kJq3uQhYl3F9n0dJk3kUe9s2xJYHq7JxYy9G",
-                            Role = 0,
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("SmartInventoryManagementSystem.Domain.Entities.ActiveDiscount", b =>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SmartInventoryManagementSystem.Domain.Enums;
+﻿using SmartInventoryManagementSystem.Domain.Enums;
 
 namespace SmartInventoryManagementSystem.Domain.Entities
 {
@@ -17,6 +12,8 @@ namespace SmartInventoryManagementSystem.Domain.Entities
         public UserStatus Status { get; set; } = UserStatus.ACTIVE;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLogin { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         // Navigation Properties
         public ICollection<StockMovement> StockMovements { get; set; } = new List<StockMovement>();

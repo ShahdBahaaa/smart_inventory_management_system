@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartInventoryManagementSystem.API.Filters;
 using SmartInventoryManagementSystem.Application.DTOs;
-using SmartInventoryManagementSystem.Application.Services;
+using SmartInventoryManagementSystem.Application.Interfaces;
 using SmartInventoryManagementSystem.Domain.Entities;
 using SmartInventoryManagementSystem.Domain.Enums;
 using SmartInventoryManagementSystem.Infrastructure.Data;

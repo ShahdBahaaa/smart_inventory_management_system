@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SmartInventoryManagementSystem.Application.Services;
+using SmartInventoryManagementSystem.Application.Interfaces;
 using SmartInventoryManagementSystem.Infrastructure.Data;
 using SmartInventoryManagementSystem.Infrastructure.Services;
 using System.Text;
@@ -18,6 +18,10 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"]!;
+
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 builder.Services.AddAuthentication(options =>
 {

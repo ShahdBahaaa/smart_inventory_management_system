@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartInventoryManagementSystem.Domain.Entities;
+using SmartInventoryManagementSystem.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace SmartInventoryManagementSystem.Infrastructure.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBatch> ProductBatches { get; set; }
         public DbSet<StockMovement> StockMovements { get; set; }
@@ -148,6 +150,9 @@ namespace SmartInventoryManagementSystem.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(dr => dr.ReviewedBy)
                 .OnDelete(DeleteBehavior.Restrict);
+           
+
+            
         }
     }
 }

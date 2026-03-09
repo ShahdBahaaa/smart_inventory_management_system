@@ -1,6 +1,6 @@
 ﻿using SmartInventoryManagementSystem.Domain.Entities;
 
-namespace SmartInventoryManagementSystem.Application.Services
+namespace SmartInventoryManagementSystem.Application.Interfaces
 {
     public interface IJwtService
     {
