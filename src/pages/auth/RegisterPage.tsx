@@ -1,41 +1,42 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { registerRequest } from "../../api/auth.api";
-import factory from "../../assets/factory.png";
-import { ArrowRight, Box } from "lucide-react";
-import "../../App.css";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowRight, Box, Loader2 } from 'lucide-react';
+import api from '../../services/api';
+import image from '../../assets/image.png';
 
 const RegisterPage = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      await registerRequest(name, email, password);
-
-      alert("Account created successfully");
-
-      navigate("/login");
-    } catch (error) {
-      console.error(error);
-      alert("Registration failed");
+      await api.auth.register(name, email, password);
+      // Automatically navigate to login page upon success
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container-fluid vh-100 p-0 m-0 overflow-hidden">
+    <div className="container-fluid vh-100 p-0 m-0 overflow-hidden bg-white">
       <div className="row h-100 g-0 m-0">
 
         {/* LEFT SIDE */}
 
         <div className="col-lg-6 col-md-6 p-0 position-relative d-none d-md-block">
           <img
-            src={factory}
+            src={image}
             alt="factory"
             style={{
               width: "100%",
@@ -72,10 +73,10 @@ const RegisterPage = () => {
 
         {/* RIGHT SIDE */}
 
-        <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center bg-dark p-0">
+        <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center bg-white p-0">
 
           <div
-            className="card bg-dark text-white shadow-lg p-4 w-100"
+            className="card bg-white text-dark shadow-lg p-4 w-100 border-0"
             style={{ maxWidth: "420px", borderRadius: "18px" }}
           >
 
@@ -83,8 +84,8 @@ const RegisterPage = () => {
 
             <div className="d-flex align-items-center gap-3 mb-4">
 
-              <div className="logoBox">
-                <Box size={26} />
+              <div className="logoBox" style={{ background: '#0ea5e9', padding: '10px', borderRadius: '12px' }}>
+                <Box size={26} className="text-white" />
               </div>
 
               <div>
@@ -106,6 +107,12 @@ const RegisterPage = () => {
               </p>
             </div>
 
+            {error && (
+              <div className="alert bg-danger bg-opacity-10 border-danger border-opacity-20 text-danger small py-2 mb-4" role="alert">
+                {error}
+              </div>
+            )}
+
             {/* FORM */}
 
             <form onSubmit={handleRegister}>
@@ -117,10 +124,11 @@ const RegisterPage = () => {
 
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control bg-white text-dark border-secondary"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
                 />
               </div>
 
@@ -131,10 +139,11 @@ const RegisterPage = () => {
 
                 <input
                   type="email"
-                  className="form-control"
+                  className="form-control bg-white text-dark border-secondary"
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
 
@@ -145,16 +154,22 @@ const RegisterPage = () => {
 
                 <input
                   type="password"
-                  className="form-control"
+                  className="form-control bg-white text-dark border-secondary"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
 
-              <button className="btn btn-info w-100 d-flex align-items-center justify-content-center gap-2 mt-3">
-                Create Account
-                <ArrowRight size={18} />
+              <button 
+                type="submit"
+                disabled={loading}
+                className="btn w-100 d-flex align-items-center justify-content-center gap-2 mt-4 text-white"
+                style={{ background: '#0ea5e9', border: 'none' }}
+              >
+                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Create Account'}
+                {!loading && <ArrowRight size={18} />}
               </button>
 
             </form>
@@ -166,8 +181,9 @@ const RegisterPage = () => {
               Already have an account?
 
               <button
-                className="btn btn-link text-info p-0 ms-1"
+                className="btn btn-link text-info p-0 ms-1 text-decoration-none"
                 onClick={() => navigate("/login")}
+                style={{ color: '#0ea5e9' }}
               >
                 Log in instead
               </button>

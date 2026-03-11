@@ -1,40 +1,41 @@
-import { useState } from "react";
-import { loginRequest } from "../../api/auth.api";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import factory from "../../assets/factory.png";
-import { ArrowRight, Box } from "lucide-react";
-import "../../App.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Box, Loader2 } from 'lucide-react';
+import api from '../../services/api';
+import image from '../../assets/image.png';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [email, setEmail] = useState('admin@pharma.com');
+  const [password, setPassword] = useState('password');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
   const navigate = useNavigate();
-  const { login } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      const data = await loginRequest(email, password);
-      login(data.accessToken);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error(error);
-      alert("Invalid email or password");
+      await api.auth.login(email, password);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container-fluid vh-100 p-0 m-0 overflow-hidden">
+    <div className="container-fluid vh-100 p-0 m-0 overflow-hidden bg-white">
       <div className="row h-100 g-0 m-0">
 
         {/* LEFT SIDE */}
 
         <div className="col-lg-6 col-md-6 p-0 position-relative d-none d-md-block">
           <img
-            src={factory}
+            src={image}
             alt="factory"
             style={{
               width: "100%",
@@ -70,10 +71,10 @@ const LoginPage = () => {
 
         {/* RIGHT SIDE */}
 
-        <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center bg-dark p-0">
+        <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center bg-white p-0">
 
           <div
-            className="card bg-dark text-white shadow-lg p-4 w-100"
+            className="card bg-white text-dark shadow-lg p-4 w-100 border-0"
             style={{ maxWidth: "420px", borderRadius: "18px" }}
           >
 
@@ -81,8 +82,8 @@ const LoginPage = () => {
 
             <div className="d-flex align-items-center gap-3 mb-4">
 
-              <div className="logoBox">
-                <Box size={26} />
+              <div className="logoBox" style={{ background: '#0ea5e9', padding: '10px', borderRadius: '12px' }}>
+                <Box size={26} className="text-white" />
               </div>
 
               <div>
@@ -104,6 +105,12 @@ const LoginPage = () => {
               </p>
             </div>
 
+            {error && (
+              <div className="alert bg-danger bg-opacity-10 border-danger border-opacity-20 text-danger small py-2 mb-4" role="alert">
+                {error}
+              </div>
+            )}
+
             {/* FORM */}
 
             <form onSubmit={handleLogin}>
@@ -115,10 +122,11 @@ const LoginPage = () => {
 
                 <input
                   type="email"
-                  className="form-control"
+                  className="form-control bg-white text-dark border-secondary"
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
 
@@ -129,16 +137,22 @@ const LoginPage = () => {
 
                 <input
                   type="password"
-                  className="form-control"
+                  className="form-control bg-white text-dark border-secondary"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
 
-              <button className="btn btn-info w-100 d-flex align-items-center justify-content-center gap-2 mt-3">
-                Sign In to Dashboard
-                <ArrowRight size={18} />
+              <button 
+                type="submit"
+                disabled={loading}
+                className="btn w-100 d-flex align-items-center justify-content-center gap-2 mt-4 text-white"
+                style={{ background: '#0ea5e9', border: 'none' }}
+              >
+                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In to Dashboard'}
+                {!loading && <ArrowRight size={18} />}
               </button>
 
             </form>
@@ -146,17 +160,15 @@ const LoginPage = () => {
             {/* REGISTER LINK */}
 
             <p className="text-center text-secondary mt-4 small">
-
               Don't have an account?
-
               <button
                 type="button"
-                className="btn btn-link text-info p-0 ms-1"
+                className="btn btn-link text-info p-0 ms-1 text-decoration-none"
                 onClick={() => navigate("/register")}
+                style={{ color: '#0ea5e9' }}
               >
                 Register now
               </button>
-
             </p>
 
           </div>
