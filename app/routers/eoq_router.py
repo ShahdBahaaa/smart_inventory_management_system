@@ -1,11 +1,28 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from app.schemas.inventory import InventoryInput, EOQResponse
+from app.services.eoq_service import calculate_inventory_metrics
 
-# This is the variable the error is looking for!
+# 1. First, we define the router (The 'Front Desk' itself)
 router = APIRouter(prefix="/ml", tags=["Machine Learning"])
 
-@router.get("/eoq-test")
-def test_eoq():
+# 2. Then, we use the router to create the endpoint
+@router.post("/calculate", response_model=EOQResponse)
+def process_inventory_data(data: InventoryInput):
+    if data.annual_demand < 0:
+        raise HTTPException(status_code=400, detail="Demand cannot be negative")
+
+    # This calls your 'Brain' to get both answers
+    eoq, rop = calculate_inventory_metrics(
+        data.annual_demand, 
+        data.order_cost, 
+        data.holding_cost, 
+        data.lead_time_days, 
+        data.safety_stock
+    )
+
     return {
-        "status": "online",
-        "message": "The EOQ Router is now communicating with main.py"
+        "product_id": data.product_id,
+        "recommended_order_quantity": eoq,
+        "reorder_point": rop,
+        "message": f"Optimization successful for {data.product_name}. Order {eoq} units when stock hits {rop}."
     }
