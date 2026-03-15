@@ -155,7 +155,7 @@ const RegisterPage = () => {
                 <input
                   type="password"
                   className="form-control bg-white text-dark border-secondary"
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="Create a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

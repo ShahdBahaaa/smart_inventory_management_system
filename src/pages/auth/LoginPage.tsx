@@ -140,7 +140,7 @@ const LoginPage = () => {
                 <input
                   type="password"
                   className="form-control bg-white text-dark border-secondary"
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

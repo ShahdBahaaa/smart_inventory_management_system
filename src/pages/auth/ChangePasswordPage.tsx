@@ -90,7 +90,7 @@ const ChangePasswordPage = () => {
                 <input 
                   type="password" 
                   className="form-control bg-transparent border-0 text-dark" 
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="Enter current password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
@@ -107,7 +107,7 @@ const ChangePasswordPage = () => {
                 <input 
                   type="password" 
                   className="form-control bg-transparent border-0 text-dark" 
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="Enter new password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -124,7 +124,7 @@ const ChangePasswordPage = () => {
                 <input 
                   type="password" 
                   className="form-control bg-transparent border-0 text-dark" 
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="Confirm new password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

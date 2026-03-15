@@ -68,16 +68,16 @@ const ProfilePage = () => {
                   <label className="form-label small fw-bold text-muted">Current Password</label>
                   <div className="input-group">
                     <span className="input-group-text bg-light border-0"><Key size={18} /></span>
-                    <input type="password" className="form-control" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" />
+                    <input type="password" className="form-control" placeholder="Enter current password" />
                   </div>
                 </div>
                 <div className="col-md-6">
                   <label className="form-label small fw-bold text-muted">New Password</label>
-                  <input type="password" className="form-control" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" />
+                  <input type="password" className="form-control" placeholder="Enter new password" />
                 </div>
                 <div className="col-md-6">
                   <label className="form-label small fw-bold text-muted">Confirm New Password</label>
-                  <input type="password" className="form-control" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" />
+                  <input type="password" className="form-control" placeholder="Confirm new password" />
                 </div>
                 <div className="col-12">
                   <button type="button" className="btn btn-outline-primary">Update Password</button>
