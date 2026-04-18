@@ -6,12 +6,26 @@ import image from '@/assets/image.png';
 import { useAuth } from '@/hooks/useAuth';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@smartinventory.com');
+  const [password, setPassword] = useState('admin1234');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const autoLogin = async () => {
+      setLoading(true);
+      try {
+        const response = await api.auth.login('admin@smartinventory.com', 'admin1234');
+        login(response.token, response.user);
+        navigate('/dashboard');
+      } catch (err: any) {
+        setLoading(false);
+      }
+    };
+    autoLogin();
+  }, [login, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

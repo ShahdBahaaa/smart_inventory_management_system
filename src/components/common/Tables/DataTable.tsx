@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 interface DataTableProps {
   columns: { key: string; label: string; render?: (item: any) => React.ReactNode; align?: 'start' | 'center' | 'end' }[];
@@ -12,40 +12,40 @@ const DataTable: React.FC<DataTableProps> = ({ columns, data, loading, emptyMess
     <div className="glass-card overflow-hidden">
       <div className="table-responsive">
         <table className="table table-hover align-middle mb-0">
-          <thead>
+          <thead className="bg-light-subtle">
             <tr>
               {columns.map((col, idx) => (
                 <th 
                   key={col.key} 
-                  className={`${idx === 0 ? 'ps-4' : ''} ${idx === columns.length - 1 ? 'pe-4' : ''} py-3 text-${col.align || 'start'}`}
+                  className={`${idx === 0 ? 'ps-4' : ''} ${idx === columns.length - 1 ? 'pe-4' : ''} py-3 text-${col.align || 'start'} border-bottom-0`}
                 >
-                  {col.label}
+                  <span className="small fw-black text-muted text-uppercase tracking-widest" style={{ fontSize: '10px' }}>{col.label}</span>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="border-top-0">
             {loading ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-5">
-                  <div className="spinner-border text-info" role="status">
+                <td colSpan={columns.length} className="text-center py-5 border-0">
+                  <div className="spinner-border text-primary spin-animation" role="status" style={{ width: '1.5rem', height: '1.5rem', borderWidth: '0.15em' }}>
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </td>
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-5 text-muted">
+                <td colSpan={columns.length} className="text-center py-5 text-muted border-0 fst-italic">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               data.map((item, rowIdx) => (
-                <tr key={item.id || rowIdx}>
+                <tr key={item.id || rowIdx} className="border-bottom border-light-subtle">
                   {columns.map((col, colIdx) => (
                     <td 
                       key={`${rowIdx}-${col.key}`} 
-                      className={`${colIdx === 0 ? 'ps-4' : ''} ${colIdx === columns.length - 1 ? 'pe-4' : ''} py-3 text-${col.align || 'start'}`}
+                      className={`${colIdx === 0 ? 'ps-4' : ''} ${colIdx === columns.length - 1 ? 'pe-4' : ''} py-3 text-${col.align || 'start'} text-inherit border-0`}
                     >
                       {col.render ? col.render(item) : item[col.key]}
                     </td>

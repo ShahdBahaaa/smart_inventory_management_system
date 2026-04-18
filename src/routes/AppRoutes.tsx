@@ -14,8 +14,6 @@ import ProfilePage from '@/pages/Profile/ProfilePage';
 import PurchaseOrdersPage from '@/pages/PurchaseOrders/PurchaseOrdersPage';
 import PODetailsPage from '@/pages/PurchaseOrders/PODetailsPage';
 import POFormPage from '@/pages/PurchaseOrders/POFormPage';
-import Recommendations from '@/pages/Recommendations';
-import ForecastsPage from '@/pages/Reports/ForecastsPage';
 import ReportsLayout from '@/pages/Reports/ReportsLayout';
 import ProductsReport from '@/pages/Reports/ProductsReport';
 import SuppliersReport from '@/pages/Reports/SuppliersReport';
@@ -23,6 +21,8 @@ import StockReport from '@/pages/Reports/StockReport';
 import ExpiryReport from '@/pages/Reports/ExpiryReport';
 import ReceivingPage from '@/pages/Warehouse/ReceivingPage';
 import StockAdjustmentPage from '@/pages/Warehouse/StockAdjustmentPage';
+import AIOptimizerHub from '@/pages/AIOptimizerHub';
+import FefoAlertsPage from '@/pages/FefoAlertsPage';
 import BusinessRulesPage from '@/pages/Owner/BusinessRulesPage';
 import POApprovalPage from '@/pages/Owner/POApprovalPage';
 import AuditLogPage from '@/pages/Owner/AuditLogPage';
@@ -45,10 +45,10 @@ export default function AppRoutes() {
         <Route path="purchase-orders" element={<PurchaseOrdersPage />} />
         <Route path="purchase-orders/new" element={<POFormPage />} />
         <Route path="purchase-orders/:id" element={<PODetailsPage />} />
+        <Route path="ai-optimizer" element={<AIOptimizerHub />} />
+        <Route path="fefo" element={<FefoAlertsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="inventory" element={<ProductsPage />} />
-        <Route path="recommendations" element={<Recommendations />} />
-        <Route path="forecasts" element={<ForecastsPage />} />
         <Route path="receiving" element={<ReceivingPage />} />
         <Route path="stock-adjustment" element={<StockAdjustmentPage />} />
         <Route path="business-rules" element={<BusinessRulesPage />} />

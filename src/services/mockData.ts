@@ -3,48 +3,55 @@ import { PurchaseOrder, Recommendation, ForecastData, EOQData } from '@/types/in
 export const mockPOs: PurchaseOrder[] = [
   {
     id: 'PO-1001',
+    productName: 'High-End Processor',
+    sku: 'HE-PRO-01',
+    quantity: 50,
+    unitPrice: 200,
+    totalAmount: 10000,
     supplier: 'Global Tech Solutions',
-    date: '2024-03-01',
     status: 'SENT',
-    total: 12500.00,
-    daysOverdue: 5,
-    items: [
-      { id: '1', name: 'High-End Processor', orderedQty: 50, receivedQty: 0, unitPrice: 200 },
-      { id: '2', name: 'Motherboard X1', orderedQty: 25, receivedQty: 0, unitPrice: 100 }
-    ]
+    orderDate: '2024-03-01',
+    expectedDelivery: '2024-03-10',
+    assignedTo: 'Admin User'
   },
   {
     id: 'PO-1002',
+    productName: 'Ergonomic Chair',
+    sku: 'ERG-CH-02',
+    quantity: 2,
+    unitPrice: 225.25,
+    totalAmount: 450.50,
     supplier: 'Office Supplies Co.',
-    date: '2024-03-05',
     status: 'DRAFT',
-    total: 450.50,
-    daysOverdue: 0,
-    items: [
-      { id: '3', name: 'Ergonomic Chair', orderedQty: 2, receivedQty: 0, unitPrice: 225.25 }
-    ]
+    orderDate: '2024-03-05',
+    expectedDelivery: '2024-03-15',
+    assignedTo: 'Admin User'
   },
   {
     id: 'PO-1003',
+    productName: 'Shipping Pallets',
+    sku: 'SHP-PAL-100',
+    quantity: 100,
+    unitPrice: 32,
+    totalAmount: 3200,
     supplier: 'Logistics Pro',
-    date: '2024-02-20',
     status: 'RECEIVED',
-    total: 3200.00,
-    daysOverdue: 0,
-    items: [
-      { id: '4', name: 'Shipping Pallets', orderedQty: 100, receivedQty: 100, unitPrice: 32 }
-    ]
+    orderDate: '2024-02-20',
+    expectedDelivery: '2024-02-25',
+    assignedTo: 'Admin User'
   },
   {
     id: 'PO-1004',
+    productName: 'Steel Rods',
+    sku: 'STL-ROD-05',
+    quantity: 500,
+    unitPrice: 17.8,
+    totalAmount: 8900,
     supplier: 'Industrial Parts Inc.',
-    date: '2024-02-15',
     status: 'CLOSED',
-    total: 8900.00,
-    daysOverdue: 0,
-    items: [
-      { id: '5', name: 'Steel Rods', orderedQty: 500, receivedQty: 500, unitPrice: 17.8 }
-    ]
+    orderDate: '2024-02-15',
+    expectedDelivery: '2024-02-22',
+    assignedTo: 'Admin User'
   }
 ];
 
@@ -73,15 +80,15 @@ export const mockRecommendations: Recommendation[] = [
 ];
 
 export const mockForecastData: ForecastData[] = [
-  { month: 'Oct', historical: 400 },
-  { month: 'Nov', historical: 450 },
-  { month: 'Dec', historical: 600 },
-  { month: 'Jan', historical: 350 },
-  { month: 'Feb', historical: 380 },
-  { month: 'Mar', historical: 420 },
-  { month: 'Apr', predicted: 450 },
-  { month: 'May', predicted: 480 },
-  { month: 'Jun', predicted: 510 }
+  { month: 'Oct', historical: 400, predicted: null },
+  { month: 'Nov', historical: 450, predicted: null },
+  { month: 'Dec', historical: 600, predicted: null },
+  { month: 'Jan', historical: 350, predicted: null },
+  { month: 'Feb', historical: 380, predicted: null },
+  { month: 'Mar', historical: 420, predicted: null },
+  { month: 'Apr', historical: null, predicted: 450 },
+  { month: 'May', historical: null, predicted: 480 },
+  { month: 'Jun', historical: null, predicted: 510 }
 ];
 
 export const mockEOQ: EOQData = {

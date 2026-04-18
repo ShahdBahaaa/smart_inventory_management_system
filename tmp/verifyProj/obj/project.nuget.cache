@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "d1zH9GNIFrc=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\DELL\\.gemini\\antigravity\\scratch\\smart_inventory_management_system\\tmp\\verifyProj\\verifyProj.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\DELL\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}

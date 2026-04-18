@@ -1,62 +1,17 @@
-﻿src/components/common/EOQCard.tsx(3,25): error TS2307: Cannot find module '@/types/index' or its corresponding type declarations.
-src/components/common/ForecastChart.tsx(13,30): error TS2307: Cannot find module '@/types/index' or its corresponding type declarations.
-src/components/common/Layout.tsx(3,21): error TS2307: Cannot find module '@/Sidebar' or its corresponding type declarations.
-src/components/common/ReceiveModal.tsx(4,24): error TS2307: Cannot find module '@/types/index' or its corresponding type declarations.
-src/components/common/StatusBadge.tsx(2,26): error TS2307: Cannot find module '@/types/index' or its corresponding type declarations.
-src/layouts/DashboardLayout.tsx(3,21): error TS2307: Cannot find module '@/Sidebar' or its corresponding type declarations.
-src/layouts/DashboardLayout.tsx(4,20): error TS2307: Cannot find module '@/Navbar' or its corresponding type declarations.
-src/pages/AiDashboard.tsx(6,8): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/pages/AiDashboard.tsx(7,27): error TS2307: Cannot find module '@/components/ForecastChart' or its corresponding type declarations.
-src/pages/AiDashboard.tsx(8,25): error TS2307: Cannot find module '@/components/StatusBadge' or its corresponding type declarations.
-src/pages/AiRecommendations.tsx(3,37): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/pages/Dashboard/DashboardPage.tsx(5,22): error TS2307: Cannot find module '@/components/common/Cards/StatCard' or its corresponding type declarations.
-src/pages/ForecastsPage.tsx(2,27): error TS2307: Cannot find module '@/components/ForecastChart' or its corresponding type declarations.
-src/pages/ForecastsPage.tsx(3,34): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/pages/PODetail.tsx(12,25): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/pages/PODetail.tsx(13,25): error TS2307: Cannot find module '@/components/StatusBadge' or its corresponding type declarations.
-src/pages/PODetail.tsx(15,26): error TS2307: Cannot find module '@/components/ReceiveModal' or its corresponding type declarations.
-src/pages/POList.tsx(4,25): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/pages/POList.tsx(5,25): error TS2307: Cannot find module '@/components/StatusBadge' or its corresponding type declarations.
-src/pages/POList.tsx(6,26): error TS2307: Cannot find module '@/types/index' or its corresponding type declarations.
-src/pages/ProductDetail.tsx(2,21): error TS2307: Cannot find module '@/components/EOQCard' or its corresponding type declarations.
-src/pages/ProductDetail.tsx(3,25): error TS2307: Cannot find module '@/mockData' or its corresponding type declarations.
-src/services/auth.api.ts(4,25): error TS2339: Property 'post' does not exist on type '{ auth: { login: (email: any, password: any) => Promise<{ user: { id: number; name: string; email: string; role: string; status: string; }; token: string; }>; register: (name: any, email: any, password: any) => Promise<...>; }; users: { ...; }; products: { ...; }; suppliers: { ...; }; purchaseOrders: { ...; }; }'.
-src/services/auth.api.ts(16,25): error TS2339: Property 'post' does not exist on type '{ auth: { login: (email: any, password: any) => Promise<{ user: { id: number; name: string; email: string; role: string; status: string; }; token: string; }>; register: (name: any, email: any, password: any) => Promise<...>; }; users: { ...; }; products: { ...; }; suppliers: { ...; }; purchaseOrders: { ...; }; }'.
-src/services/mockData.ts(1,70): error TS2307: Cannot find module '@/types' or its corresponding type declarations.
-src/tests/inventory.test.ts(20,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(21,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(31,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(34,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(35,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(38,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(39,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(42,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(43,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(48,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(49,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(51,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(54,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(55,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(58,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(60,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(65,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(66,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(67,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(70,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(71,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(74,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(75,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(78,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(79,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(84,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(85,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(94,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(95,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(96,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(99,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(106,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(111,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(112,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(113,5): error TS2304: Cannot find name 'expect'.
-src/tests/inventory.test.ts(116,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
-src/tests/inventory.test.ts(117,5): error TS2304: Cannot find name 'expect'.
+﻿
+> react-example@0.0.0 lint
+> tsc --noEmit
+
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(7,5): error TS2353: Object literal may only specify known properties, and 'date' does not exist in type 'PurchaseOrder'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(19,5): error TS2353: Object literal may only specify known properties, and 'date' does not exist in type 'PurchaseOrder'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(30,5): error TS2353: Object literal may only specify known properties, and 'date' does not exist in type 'PurchaseOrder'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(41,5): error TS2353: Object literal may only specify known properties, and 'date' does not exist in type 'PurchaseOrder'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(76,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(77,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(78,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(79,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(80,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(81,3): error TS2741: Property 'predicted' is missing in type '{ month: string; historical: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(82,3): error TS2741: Property 'historical' is missing in type '{ month: string; predicted: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(83,3): error TS2741: Property 'historical' is missing in type '{ month: string; predicted: number; }' but required in type 'ForecastData'.
+smart_inventory_management_system-backend/smart_inventory_management_system-backend/src/services/mockData.ts(84,3): error TS2741: Property 'historical' is missing in type '{ month: string; predicted: number; }' but required in type 'ForecastData'.

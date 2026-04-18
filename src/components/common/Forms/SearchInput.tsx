@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, X } from 'lucide-react';
 
 interface SearchInputProps {
@@ -50,34 +50,39 @@ const SearchInput: React.FC<SearchInputProps> = ({ placeholder = 'Search...', on
 
   return (
     <div className="position-relative" ref={dropdownRef}>
-      <div className="input-group glass-card border-0 p-1">
-        <span className="input-group-text bg-transparent border-0">
-          {loading ? <Loader2 size={18} className="text-info animate-spin" /> : <Search size={18} className="text-info opacity-75" />}
+      <div className="input-group glass-card border-0 p-1 shadow-sm">
+        <span className="input-group-text bg-transparent border-0 pe-1">
+          {loading ? (
+            <Loader2 size={18} className="text-primary spin-animation" />
+          ) : (
+            <Search size={18} className="text-primary opacity-50" />
+          )}
         </span>
         <input
           type="text"
-          className="form-control bg-transparent border-0 text-dark ps-0"
+          className="form-control bg-transparent border-0 ps-2 text-inherit"
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query && setShowDropdown(true)}
+          style={{ boxShadow: 'none' }}
         />
         {query && (
-          <button className="btn btn-link text-info opacity-50 hover-opacity-100 border-0" type="button" onClick={() => setQuery('')}>
-            <X size={14} />
+          <button className="btn btn-link text-muted p-2 text-decoration-none border-0 shadow-none op-hover-100" type="button" onClick={() => setQuery('')}>
+            <X size={16} />
           </button>
         )}
       </div>
 
       {showDropdown && (
-        <div className="dropdown-menu show w-100 glass-card border-secondary border-opacity-10 shadow-lg mt-1 py-2 rounded-3 overflow-hidden" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+        <div className="dropdown-menu show w-100 glass-card border-light-subtle shadow-lg mt-2 py-2 rounded-3 overflow-hidden border" style={{ maxHeight: '350px', overflowY: 'auto', zIndex: 1050 }}>
           {loading ? (
-            <div className="px-3 py-2 text-muted small">Analyzing registry...</div>
+            <div className="px-3 py-3 text-muted small fst-italic">Analyzing network nodes...</div>
           ) : results.length > 0 ? (
             results.map((result, index) => (
               <button
                 key={index}
-                className="dropdown-item py-2 px-3 border-bottom border-secondary border-opacity-5 last-border-0 text-dark hover-bg-white"
+                className="dropdown-item py-3 px-4 border-bottom border-light-subtle text-inherit bg-hover-light-subtle transition-all"
                 onClick={() => {
                   onResultClick(result);
                   setShowDropdown(false);
@@ -88,7 +93,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ placeholder = 'Search...', on
               </button>
             ))
           ) : (
-            <div className="px-3 py-2 text-muted small">No matching nodes found</div>
+            <div className="px-3 py-3 text-muted small fst-italic">No matches identified in registry.</div>
           )}
         </div>
       )}

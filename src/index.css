@@ -1,117 +1,169 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 :root {
+  /* Restockly Light Theme */
   --bg-dark: #f8fafc;
   --bg-card: #ffffff;
-  --neon-blue: #0ea5e9;
-  --neon-purple: #8b5cf6;
-  --text-main: #1e293b;
+  --text-main: #0f172a;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
   --glass-bg: rgba(255, 255, 255, 0.8);
   --glass-border: rgba(0, 0, 0, 0.08);
+  
+  --nexus-primary: #0ea5e9;
+  --nexus-glow: rgba(14, 165, 233, 0.1);
+}
+
+[data-bs-theme="dark"] {
+  /* Restockly Dark Theme */
+  --bg-dark: #030712;
+  --bg-card: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  
+  --nexus-primary: #00BFFF;
+  --nexus-glow: rgba(0, 191, 255, 0.3);
 }
 
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  text-decoration: none !important;
 }
 
 .glass-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: var(--neon-blue);
-  box-shadow: 0 8px 30px 0 rgba(14, 165, 233, 0.1);
+  border-color: var(--nexus-primary);
+  box-shadow: 0 0 30px var(--nexus-glow);
+  transform: translateY(-2px);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 15px var(--nexus-glow);
 }
 
 .neon-text {
-  color: var(--neon-blue);
-  font-weight: 600;
+  color: var(--nexus-primary);
+  text-shadow: 0 0 10px var(--nexus-glow);
 }
 
-.neon-border {
-  border: 1px solid var(--neon-blue);
+/* Custom Nexus Utilities */
+.bg-nexus-dark { background-color: #030712; }
+.border-nexus { border-color: var(--border-color); }
+.border-white-5 { border-color: rgba(255, 255, 255, 0.05) !important; }
+
+.active-nav-item {
+  background: var(--nexus-glow);
+  color: var(--nexus-primary) !important;
+  border: 1px solid var(--glass-border);
+}
+
+.hover-bg-light:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main) !important;
+}
+
+.fw-black { font-weight: 900 !important; }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
 }
 
 .sidebar {
-  background: #ffffff !important;
-  border-right: 1px solid var(--border-color);
-}
-
-.nav-link {
-  color: var(--text-muted) !important;
-  border-radius: 8px;
-  margin: 4px 15px;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-  color: var(--neon-blue) !important;
-  background: rgba(14, 165, 233, 0.05);
-}
-
-.nav-link.active {
-  color: var(--neon-blue) !important;
-  background: rgba(14, 165, 233, 0.1) !important;
-  border-left: 3px solid var(--neon-blue);
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(40px);
+  border-right: 1px solid var(--glass-border);
 }
 
 .navbar {
-  background: #ffffff !important;
-  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .table {
   color: var(--text-main) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
 }
 
 .table thead th {
-  background: #f1f5f9 !important;
+  background: transparent !important;
   color: var(--text-muted) !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  border: none !important;
   text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 1px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 1rem !important;
 }
 
-.table td {
-  border-bottom: 1px solid #f1f5f9 !important;
-  padding: 1rem 0.75rem !important;
+.table tbody tr {
+  background: rgba(255, 255, 255, 0.02) !important;
+  transition: all 0.2s;
 }
+
+.table tbody tr td {
+  border: none !important;
+  padding: 1.25rem 1rem !important;
+  vertical-align: middle;
+}
+
+.table tbody tr td:first-child { border-radius: 12px 0 0 12px; }
+.table tbody tr td:last-child { border-radius: 0 12px 12px 0; }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(14, 165, 233, 0.03) !important;
-  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  transform: scale(1.005);
+}
+
+.form-control, .form-select {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 12px !important;
+  transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--nexus-primary) !important;
+  box-shadow: 0 0 0 4px var(--nexus-glow) !important;
+  outline: none !important;
 }
 
 .badge {
   font-weight: 600;
   letter-spacing: 0.5px;
   padding: 0.5em 0.8em;
+  border-radius: 8px;
 }
 
-.badge-valid { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-.badge-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
-.badge-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-.form-control, .form-select {
-  background-color: #ffffff !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-main) !important;
-}
-
-.form-control:focus {
-  box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.1) !important;
-  border-color: var(--neon-blue) !important;
-}
+.badge-valid { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+.badge-warning { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+.badge-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
 
 .bg-purple { background-color: var(--neon-purple) !important; }
 .text-purple { color: var(--neon-purple) !important; }

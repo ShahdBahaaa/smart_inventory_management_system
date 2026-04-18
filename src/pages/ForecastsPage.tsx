@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ForecastChart from '@/components/common/ForecastChart';
 import { mockForecastData } from '@/services/mockData';
 import { TrendingUp, Calendar, Info } from 'lucide-react';
@@ -6,57 +6,58 @@ import { Row, Col, Card } from 'react-bootstrap';
 
 export default function ForecastsPage() {
   return (
-    <div className="py-4">
-      <Row className="align-items-end mb-5">
-        <Col>
-          <h1 className="display-6 fw-bold text-dark">Demand Forecasting</h1>
-          <p className="text-secondary">Predict future demand based on historical trends and seasonal patterns.</p>
-        </Col>
-        <Col xs="auto">
-          <div className="d-flex align-items-center gap-2 bg-light border border-secondary border-opacity-25 px-3 py-2 rounded text-secondary small">
-            <Calendar size={16} />
-            Next 3 Months
-          </div>
-        </Col>
-      </Row>
+    <div className="py-4 animate-in fade-in duration-700">
+      <div className="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-5 gap-4">
+        <PageHeader 
+          title="Demand Forecasting" 
+          subtitle="Predict future demand based on historical trends and seasonal patterns."
+        />
+        <div className="d-flex align-items-center gap-2 bg-light-subtle border px-3 py-2 rounded-3 text-muted small shadow-sm">
+          <Calendar size={16} />
+          <span className="fw-bold text-uppercase tracking-widest" style={{ fontSize: '10px' }}>Next 3 Months</span>
+        </div>
+      </div>
 
-      <Row className="g-4">
-        <Col lg={8}>
-          <ForecastChart data={mockForecastData} />
-        </Col>
+      <div className="row g-4">
+        <div className="col-lg-8">
+          <div className="glass-card p-0 overflow-hidden h-100 shadow-sm border-0">
+            <ForecastChart data={mockForecastData} />
+          </div>
+        </div>
         
-        <Col lg={4}>
-          <Card className="p-4 mb-4 shadow-sm h-100">
-            <h5 className="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
-              <TrendingUp className="text-success" size={20} />
-              Forecast Summary
+        <div className="col-lg-4">
+          <div className="glass-card p-4 p-lg-5 h-100 d-flex flex-column shadow-sm">
+            <h5 className="fw-bold text-inherit mb-4 d-flex align-items-center gap-2 italic">
+               <TrendingUp className="text-primary" size={20} />
+               Forecast Summary
             </h5>
-            <div className="space-y-4">
-              <div className="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-10">
-                <span className="text-secondary">Predicted Growth</span>
-                <span className="text-success fw-bold">+12.5%</span>
+            <div className="d-grid gap-2">
+              <div className="d-flex justify-content-between align-items-center py-3 border-bottom border-light-subtle">
+                <span className="small fw-bold text-muted text-uppercase tracking-widest" style={{ fontSize: '10px' }}>Predicted Growth</span>
+                <span className="text-primary fw-black fs-5 fst-italic">+12.5%</span>
               </div>
-              <div className="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-10">
-                <span className="text-secondary">Confidence Level</span>
-                <span className="text-primary fw-bold">88%</span>
+              <div className="d-flex justify-content-between align-items-center py-3 border-bottom border-light-subtle">
+                <span className="small fw-bold text-muted text-uppercase tracking-widest" style={{ fontSize: '10px' }}>Confidence Level</span>
+                <span className="text-info fw-black fs-5">88%</span>
               </div>
               <div className="d-flex justify-content-between align-items-center py-3">
-                <span className="text-secondary">Peak Demand Month</span>
-                <span className="text-dark fw-bold">June</span>
+                <span className="small fw-bold text-muted text-uppercase tracking-widest" style={{ fontSize: '10px' }}>Peak Demand Month</span>
+                <span className="text-inherit fw-black fs-5">June</span>
               </div>
             </div>
 
             <div className="mt-auto pt-4">
-              <div className="p-3 rounded bg-info bg-opacity-10 border border-info border-opacity-25 d-flex gap-3">
-                <Info className="text-info shrink-0" size={20} />
-                <p className="small text-secondary mb-0">
+              <div className="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 d-flex gap-3">
+                <Info className="text-primary flex-shrink-0" size={20} />
+                <p className="small text-muted mb-0 fst-italic">
                   Our model uses Exponential Smoothing to provide accurate predictions.
                 </p>
               </div>
             </div>
-          </Card>
-        </Col>
-      </Row>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   );
 }

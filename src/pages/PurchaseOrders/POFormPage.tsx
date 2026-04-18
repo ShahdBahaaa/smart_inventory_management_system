@@ -1,73 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Check, Package, DollarSign, Truck, ArrowLeft, 
-  Plus, Search, ShieldCheck, Star, Activity, ClipboardList, Archive
+import {
+  Check, Package, DollarSign, Truck, ArrowLeft,
+  Plus, Search, ShieldCheck, Activity, ClipboardList, Archive, Loader
 } from 'lucide-react';
 import PageHeader from '@/components/common/Layout/PageHeader';
-import { usePO } from '@/store/POContext';
-
-// Mock Data
-const mockSuppliers = [
-  { id: 'SUP-001', name: 'Global Pharma Solutions', score: 96, onTime: '98%', quality: '99%' },
-  { id: 'SUP-002', name: 'MedEquip Direct', score: 88, onTime: '90%', quality: '92%' },
-  { id: 'SUP-003', name: 'BioTech Industries', score: 79, onTime: '75%', quality: '85%' },
-];
-
-const mockProducts = [
-  { id: 'PRD-001', name: 'Amoxicillin 500mg', sku: 'AMX-500', stock: 45, suggestedQty: 500, price: 12.50 },
-  { id: 'PRD-002', name: 'Ibuprofen 400mg', sku: 'IBU-400', stock: 12, suggestedQty: 1000, price: 5.75 },
-  { id: 'PRD-003', name: 'Lisinopril 10mg', sku: 'LIS-10', stock: 200, suggestedQty: 300, price: 15.00 },
-];
+import api from '@/services/api';
 
 export default function POFormPage() {
   const navigate = useNavigate();
-  const { addOrder } = usePO();
   const [step, setStep] = useState(1);
-  const [supplierId, setSupplierId] = useState('');
-  
+  const [supplierId, setSupplierId] = useState<number | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const supplier = mockSuppliers.find(s => s.id === supplierId);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [supData, prodData] = await Promise.all([
+          api.suppliers.getAll(),
+          api.products.getAll(),
+        ]);
+        setSuppliers(supData);
+        setProducts(prodData);
+      } catch (err) {
+        console.error('Failed to load form data', err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    load();
+  }, []);
+
+  const supplier = suppliers.find(s => s.id === supplierId);
 
   const handleSelectProduct = (product: any) => {
     if (!selectedItems.find(i => i.id === product.id)) {
-      setSelectedItems([...selectedItems, { ...product, orderQty: product.suggestedQty }]);
+      setSelectedItems([...selectedItems, { ...product, orderQty: 1, unitPrice: product.price || 0 }]);
     }
   };
 
-  const handleUpdateItem = (id: string, field: string, value: number) => {
-    setSelectedItems(selectedItems.map(item => 
+  const handleUpdateItem = (id: any, field: string, value: number) => {
+    setSelectedItems(selectedItems.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     ));
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = (id: any) => {
     setSelectedItems(selectedItems.filter(item => item.id !== id));
   };
 
-  const calculateSubtotal = () => {
-    return selectedItems.reduce((acc, item) => acc + (item.orderQty * item.price), 0);
+  const calculateSubtotal = () =>
+    selectedItems.reduce((acc, item) => acc + (item.orderQty * item.unitPrice), 0);
+
+  const handleSubmit = async () => {
+    if (!supplierId) return;
+    setSubmitting(true);
+    setError('');
+    try {
+      // 1. Create the PO
+      const newPO = await api.purchaseOrders.create({ supplierID: supplierId as number });
+      const poId = newPO.id || newPO.orderID;
+
+      // 2. Add each item to the PO
+      await Promise.all(
+        selectedItems.map(item =>
+          api.purchaseOrders.addItem(poId, {
+            productID: item.id,
+            orderedQuantity: item.orderQty,
+            unitPrice: item.unitPrice,
+          })
+        )
+      );
+
+      navigate('/dashboard/purchase-orders');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data || 'Failed to create purchase order.';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      setSubmitting(false);
+    }
   };
 
-  const handleSubmit = () => {
-    const total = calculateSubtotal();
-    const newPO = { 
-      id: `PO-2026-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`, 
-      supplier: supplier?.name || supplierId,
-      status: 'DRAFT',
-      date: new Date().toISOString().split('T')[0],
-      total 
-    };
-    addOrder(newPO);
-    navigate('/dashboard/purchase-orders');
-  };
-
-  const filteredProducts = mockProducts.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.sku.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter(p =>
+    (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.sku || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loadingData) {
+    return (
+      <div className="d-flex justify-content-center align-items-center py-5">
+        <Loader size={32} className="text-info" style={{ animation: 'spin 1s linear infinite' }} />
+      </div>
+    );
+  }
 
   return (
     <div className="fade-in pb-5">
@@ -106,7 +137,8 @@ export default function POFormPage() {
       </div>
 
       <div className="glass-card p-4 border-0 shadow-sm rounded-4 bg-white" style={{ minHeight: '400px' }}>
-        
+        {error && <div className="alert alert-danger mb-4">{error}</div>}
+
         {/* STEP 1: SELECT SUPPLIER */}
         {step === 1 && (
           <div className="animate-fade-in">
@@ -116,12 +148,16 @@ export default function POFormPage() {
               </div>
               Select Vendor
             </h4>
-            
+
             <div className="mb-4" style={{ maxWidth: '600px' }}>
               <label className="form-label text-muted fw-bold small tracking-wider">SUPPLIER</label>
-              <select className="form-select border-secondary border-opacity-25 py-2 shadow-sm" value={supplierId} onChange={(e) => setSupplierId(e.target.value)}>
+              <select
+                className="form-select border-secondary border-opacity-25 py-2 shadow-sm"
+                value={supplierId}
+                onChange={(e) => setSupplierId(parseInt(e.target.value) || '')}
+              >
                 <option value="">Select a vetted supplier...</option>
-                {mockSuppliers.map(s => (
+                {suppliers.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </select>
@@ -141,23 +177,23 @@ export default function POFormPage() {
                   <div className="row g-3">
                     <div className="col-4">
                       <p className="text-muted small fw-bold mb-1">SCORE</p>
-                      <h4 className="text-info fw-bold mb-0">{supplier.score}%</h4>
+                      <h4 className="text-info fw-bold mb-0">{supplier.score || 0}%</h4>
                     </div>
                     <div className="col-4">
-                      <p className="text-muted small fw-bold mb-1">ON-TIME</p>
-                      <h5 className="text-dark fw-bold mb-0">{supplier.onTime}</h5>
+                      <p className="text-muted small fw-bold mb-1">CONTACT</p>
+                      <h5 className="text-dark fw-bold mb-0 small">{supplier.contact || '—'}</h5>
                     </div>
                     <div className="col-4">
-                      <p className="text-muted small fw-bold mb-1">QUALITY</p>
-                      <h5 className="text-dark fw-bold mb-0">{supplier.quality}</h5>
+                      <p className="text-muted small fw-bold mb-1">EMAIL</p>
+                      <h5 className="text-dark fw-bold mb-0 small">{supplier.email || '—'}</h5>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            <button 
-              className="btn fw-bold px-5 text-white shadow-glow d-flex align-items-center gap-2" 
+            <button
+              className="btn fw-bold px-5 text-white shadow-glow d-flex align-items-center gap-2"
               style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)', border: 'none', borderRadius: '8px', padding: '12px 24px' }}
               disabled={!supplierId}
               onClick={() => setStep(2)}
@@ -175,7 +211,7 @@ export default function POFormPage() {
                 <div className="bg-info bg-opacity-10 p-2 rounded-circle text-info">
                   <Search size={20} />
                 </div>
-                Search & Add Products
+                Search &amp; Add Products
               </h4>
               <span className="badge bg-dark bg-opacity-10 text-dark border border-dark border-opacity-10 px-3 py-2 rounded-pill fw-bold">
                 {selectedItems.length} Items Selected
@@ -186,10 +222,10 @@ export default function POFormPage() {
               <span className="input-group-text bg-white border-secondary border-opacity-25">
                 <Search size={18} className="text-muted" />
               </span>
-              <input 
-                type="text" 
-                className="form-control border-secondary border-opacity-25 py-2" 
-                placeholder="Search by product name or SKU..." 
+              <input
+                type="text"
+                className="form-control border-secondary border-opacity-25 py-2"
+                placeholder="Search by product name or SKU..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -201,11 +237,13 @@ export default function POFormPage() {
                   <tr>
                     <th className="text-muted small fw-bold">PRODUCT</th>
                     <th className="text-muted small fw-bold text-center">CURRENT STOCK</th>
-                    <th className="text-muted small fw-bold text-center">SUGGESTED QTY</th>
                     <th className="text-muted small fw-bold text-end">ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {filteredProducts.length === 0 && (
+                    <tr><td colSpan={3} className="text-center text-muted py-4">No products found</td></tr>
+                  )}
                   {filteredProducts.map(product => {
                     const isSelected = selectedItems.find(i => i.id === product.id);
                     return (
@@ -215,13 +253,12 @@ export default function POFormPage() {
                           <div className="small text-muted">{product.sku}</div>
                         </td>
                         <td className="text-center">
-                          <span className={`badge px-2 py-1 rounded-pill ${product.stock < 50 ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25' : 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'}`}>
-                            {product.stock} units
+                          <span className={`badge px-2 py-1 rounded-pill ${(product.stock || 0) < (product.lowStockThreshold || 50) ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25' : 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'}`}>
+                            {product.stock || 0} units
                           </span>
                         </td>
-                        <td className="text-center fw-bold text-info">{product.suggestedQty}</td>
                         <td className="text-end">
-                          <button 
+                          <button
                             className={`btn btn-sm fw-bold d-inline-flex align-items-center gap-1 ${isSelected ? 'btn-light text-success' : 'btn-outline-info'}`}
                             onClick={() => handleSelectProduct(product)}
                             disabled={!!isSelected}
@@ -238,8 +275,8 @@ export default function POFormPage() {
 
             <div className="d-flex gap-3 pt-3 border-top border-secondary border-opacity-10">
               <button className="btn btn-light fw-bold px-4 border" onClick={() => setStep(1)}>Back</button>
-              <button 
-                className="btn fw-bold px-5 text-white shadow-glow" 
+              <button
+                className="btn fw-bold px-5 text-white shadow-glow"
                 style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)', border: 'none', borderRadius: '8px' }}
                 onClick={() => setStep(3)}
                 disabled={selectedItems.length === 0}
@@ -257,7 +294,7 @@ export default function POFormPage() {
               <div className="bg-info bg-opacity-10 p-2 rounded-circle text-info">
                 <Package size={20} />
               </div>
-              Define Quantities & Prices
+              Define Quantities &amp; Prices
             </h4>
 
             <div className="d-flex flex-column gap-3 mb-4">
@@ -272,11 +309,7 @@ export default function POFormPage() {
                       <div className="col-md-7 d-flex justify-content-end align-items-center gap-4">
                         <div className="text-end">
                           <span className="small text-muted fw-bold d-block mb-1">CURRENT STOCK</span>
-                          <span className="badge bg-secondary bg-opacity-10 text-dark border border-secondary border-opacity-25 px-2 py-1">{item.stock}</span>
-                        </div>
-                        <div className="text-end border-start ps-4">
-                          <span className="small text-muted fw-bold d-block mb-1">SUGGESTED</span>
-                          <span className="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-2 py-1">{item.suggestedQty}</span>
+                          <span className="badge bg-secondary bg-opacity-10 text-dark border border-secondary border-opacity-25 px-2 py-1">{item.stock || 0}</span>
                         </div>
                       </div>
                     </div>
@@ -287,11 +320,11 @@ export default function POFormPage() {
                       </div>
                       <div className="col-md-3">
                         <label className="form-label text-muted fw-bold small">UNIT PRICE ($)</label>
-                        <input type="number" step="0.01" min="0" className="form-control" value={item.price} onChange={(e) => handleUpdateItem(item.id, 'price', parseFloat(e.target.value) || 0)} />
+                        <input type="number" step="0.01" min="0" className="form-control" value={item.unitPrice} onChange={(e) => handleUpdateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)} />
                       </div>
                       <div className="col-md-3">
                         <label className="form-label text-muted fw-bold small">LINE TOTAL</label>
-                        <div className="form-control bg-white border-0 fw-bold fs-5 text-dark">${(item.orderQty * item.price).toFixed(2)}</div>
+                        <div className="form-control bg-white border-0 fw-bold fs-5 text-dark">${(item.orderQty * item.unitPrice).toFixed(2)}</div>
                       </div>
                       <div className="col-md-3 d-flex justify-content-end">
                         <button className="btn btn-outline-danger btn-sm px-4 fw-bold" onClick={() => handleRemoveItem(item.id)}>Remove</button>
@@ -310,8 +343,8 @@ export default function POFormPage() {
 
             <div className="d-flex gap-3 pt-3 border-top border-secondary border-opacity-10">
               <button className="btn btn-light fw-bold px-4 border" onClick={() => setStep(2)}>Back</button>
-              <button 
-                className="btn fw-bold px-5 text-white shadow-glow" 
+              <button
+                className="btn fw-bold px-5 text-white shadow-glow"
                 style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)', border: 'none', borderRadius: '8px' }}
                 onClick={() => setStep(4)}
                 disabled={selectedItems.length === 0}
@@ -353,8 +386,8 @@ export default function POFormPage() {
                           <tr key={idx} className="border-bottom border-light">
                             <td className="ps-4 py-3 fw-medium text-dark">{item.name}</td>
                             <td className="text-center py-3">{item.orderQty}</td>
-                            <td className="text-end py-3 text-muted">${item.price.toFixed(2)}</td>
-                            <td className="text-end pe-4 py-3 fw-bold text-dark">${(item.orderQty * item.price).toFixed(2)}</td>
+                            <td className="text-end py-3 text-muted">${item.unitPrice.toFixed(2)}</td>
+                            <td className="text-end pe-4 py-3 fw-bold text-dark">${(item.orderQty * item.unitPrice).toFixed(2)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -370,14 +403,14 @@ export default function POFormPage() {
                     <h5 className="mb-4 fw-bold text-info d-flex align-items-center gap-2">
                       <Truck size={18} /> {supplier?.name}
                     </h5>
-                    
+
                     <p className="mb-1 text-muted fw-bold text-uppercase small tracking-wider">ORDER STATUS</p>
                     <div className="mb-4">
                       <span className="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill fw-bold">
-                        <Archive size={14} className="me-1 d-inline-block" style={{ marginTop: '-2px' }}/> DRAFT
+                        <Archive size={14} className="me-1 d-inline-block" style={{ marginTop: '-2px' }} /> DRAFT
                       </span>
                     </div>
-                    
+
                     <div className="border-top border-secondary border-opacity-10 pt-4 mt-2">
                       <p className="mb-1 text-muted fw-bold text-uppercase small tracking-wider">ESTIMATED TOTAL</p>
                       <h2 className="fw-bold text-dark m-0">${calculateSubtotal().toFixed(2)}</h2>
@@ -386,15 +419,16 @@ export default function POFormPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="d-flex justify-content-between pt-4 border-top border-secondary border-opacity-10">
               <button className="btn btn-light fw-bold px-4 border" onClick={() => setStep(3)}>Back</button>
-              <button 
-                className="btn btn-success fw-bold px-5 d-flex align-items-center gap-2 shadow-glow" 
+              <button
+                className="btn btn-success fw-bold px-5 d-flex align-items-center gap-2 shadow-glow"
                 style={{ borderRadius: '8px', padding: '12px 24px' }}
                 onClick={handleSubmit}
+                disabled={submitting}
               >
-                <Check size={18} /> Submit Purchase Order
+                {submitting ? <><Loader size={18} className="me-1" /> Submitting...</> : <><Check size={18} /> Submit Purchase Order</>}
               </button>
             </div>
           </div>

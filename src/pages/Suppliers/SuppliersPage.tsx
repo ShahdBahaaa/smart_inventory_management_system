@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, Star, Globe, ShieldCheck, Zap, BarChart2, Eye, Plus, Save } from 'lucide-react';
+import { ShieldCheck, Eye, Plus, Save, Edit2, Trash2, Globe, Mail, Phone, User as UserIcon } from 'lucide-react';
 import api from '@/services/api';
 import PageHeader from '@/components/common/Layout/PageHeader';
 import DataTable from '@/components/common/Tables/DataTable';
@@ -8,137 +8,148 @@ import DataTable from '@/components/common/Tables/DataTable';
 const SuppliersPage = () => {
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({ name: '', contact: '', email: '', phone: '', status: 'ACTIVE' });
 
-  const handleCreateSupplier = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newSupplier = { 
-      id: Date.now().toString(), 
-      score: 85, 
-      ...formData 
-    };
-    setSuppliers([...suppliers, newSupplier]);
-    setShowAddModal(false);
-    setFormData({ name: '', contact: '', email: '', phone: '', status: 'ACTIVE' });
+  const fetchSuppliers = async () => {
+    try {
+      const data = await api.suppliers.getAll();
+      setSuppliers(data);
+    } catch (err) {
+      console.error('Failed to fetch suppliers', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    const fetchSuppliers = async () => {
-      try {
-        const data = await api.suppliers.getAll();
-        setSuppliers(data);
-      } catch (error) {
-        console.error('Failed to fetch suppliers', error);
-      } finally {
-        setLoading(false);
+  useEffect(() => { fetchSuppliers(); }, []);
+
+  const openAddModal = () => {
+    setFormData({ name: '', contact: '', email: '', phone: '', status: 'ACTIVE' });
+    setEditingSupplier(null);
+    setError('');
+    setShowModal(true);
+  };
+
+  const openEditModal = (s: any) => {
+    setFormData({ name: s.name || '', contact: s.contact || '', email: s.email || '', phone: s.phone || '', status: s.status || 'ACTIVE' });
+    setEditingSupplier(s);
+    setError('');
+    setShowModal(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      if (editingSupplier) {
+        await api.suppliers.update(editingSupplier.id, formData);
+      } else {
+        await api.suppliers.create(formData);
       }
-    };
-    fetchSuppliers();
-  }, []);
+      await fetchSuppliers();
+      setShowModal(false);
+      setEditingSupplier(null);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data || 'Failed to save supplier.';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (supplier: any) => {
+    if (!confirm(`Delete supplier "${supplier.name}"?`)) return;
+    try {
+      await api.suppliers.delete(supplier.id);
+      setSuppliers(suppliers.filter(s => s.id !== supplier.id));
+    } catch (err) {
+      console.error('Failed to delete supplier', err);
+    }
+  };
 
   const columns = [
     {
       key: 'name',
-      label: 'SUPPLIER NAME',
+      label: 'Network Node',
       render: (supplier: any) => (
         <div className="d-flex align-items-center gap-3">
-          <div className="p-2 rounded-3 border d-flex align-items-center justify-content-center" style={{ width: '36px', height: '36px', backgroundColor: '#F0FBFF', borderColor: '#BCE8F5', color: '#00BFFF' }}>
-            <ShieldCheck size={18} />
+          <div className="rounded-3 bg-light-subtle d-flex align-items-center justify-content-center border" style={{ width: '40px', height: '40px' }}>
+            <Globe size={18} className="text-primary" />
           </div>
           <div>
-            <span className="fw-bold fs-6 d-block" style={{ color: '#00BFFF' }}>{supplier.name}</span>
+            <span className="fw-bold text-inherit tracking-tight d-block">{supplier.name}</span>
+            <span className="small fw-black text-muted text-uppercase tracking-widest" style={{ fontSize: '9px' }}>{supplier.status}</span>
           </div>
         </div>
       )
     },
     {
       key: 'contact',
-      label: 'PRIMARY CONTACT',
+      label: 'Primary Interface',
       render: (supplier: any) => (
-        <div>
-          <span className="fw-bold text-dark d-block" style={{ fontSize: '0.9rem' }}>{supplier.contact}</span>
-          <span className="text-muted small d-block" style={{ fontSize: '0.8rem' }}>{supplier.email || `contact@${supplier.name.toLowerCase().replace(/\s+/g, '')}.com`}</span>
+        <div className="d-grid gap-1">
+          <div className="d-flex align-items-center gap-2 small fw-bold text-inherit">
+             <UserIcon size={12} className="text-primary"/> {supplier.contact || 'Main Desk'}
+          </div>
+          <div className="d-flex align-items-center gap-2 small text-muted font-monospace" style={{ fontSize: '10px' }}>
+             <Mail size={10}/> {supplier.email || `contact@${(supplier.name || '').toLowerCase().replace(/\s+/g, '')}.com`}
+          </div>
         </div>
       )
     },
     {
       key: 'score',
-      label: 'PERFORMANCE SCORE',
-      render: (supplier: any) => (
-        <div className="d-flex align-items-center justify-content-between gap-3 w-100 pe-4">
-          <div className="progress flex-grow-1 rounded-pill bg-light" style={{ height: '6px', maxWidth: '300px' }}>
-            <div
-              className="progress-bar rounded-pill"
-              role="progressbar"
-              style={{ width: `${supplier.score}%`, backgroundColor: '#00BFFF' }}
-            ></div>
+      label: 'Reliability Index',
+      render: (supplier: any) => {
+        const score = supplier.score || 0;
+        return (
+          <div className="w-100 max-width-xs d-grid gap-2" style={{ maxWidth: '200px' }}>
+            <div className="d-flex justify-content-between align-items-center small fw-black text-uppercase tracking-widest" style={{ fontSize: '10px' }}>
+               <span className="text-muted">Sync Rate</span>
+               <span className="text-primary">{score}%</span>
+            </div>
+            <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+               <div className="progress-bar bg-primary" role="progressbar" style={{ width: `${score}%` }} />
+            </div>
           </div>
-          <span className="fw-bold" style={{ color: '#00BFFF', minWidth: '40px' }}>{Math.round((supplier.score / 100) * 1000)}%</span>
-        </div>
-      )
+        );
+      }
     },
     {
       key: 'actions',
-      label: 'ACTIONS',
+      label: 'Operations',
       align: 'end' as const,
       render: (supplier: any) => (
-        <div className="d-flex justify-content-end">
-          <Link
-            to={`/dashboard/suppliers/${supplier.id}`}
-            className="btn btn-sm rounded-2 d-flex align-items-center justify-content-center transition-all"
-            style={{ 
-              background: '#E0F7FA',
-              color: '#00BFFF',
-              width: '32px', 
-              height: '32px',
-              border: 'none',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = '#B2EBF2';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = '#E0F7FA';
-            }}
-            title="View Scorecard"
-          >
-            <Eye size={18} strokeWidth={2} />
-          </Link>
+        <div className="d-flex justify-end gap-2">
+          <button onClick={() => openEditModal(supplier)} className="btn btn-sm btn-outline-secondary border-0 p-2"><Edit2 size={14} /></button>
+          <button onClick={() => handleDelete(supplier)} className="btn btn-sm btn-outline-danger border-0 p-2"><Trash2 size={14} /></button>
+          <Link to={`/dashboard/suppliers/${supplier.id}`} className="btn btn-sm btn-outline-primary border-0 p-2"><Eye size={14} /></Link>
         </div>
       )
     }
   ];
 
   return (
-    <div className="fade-in">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div className="py-4 animate-in fade-in duration-700">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4 mb-5">
         <PageHeader
-          title="Supply Chain Nodes"
-          subtitle="Verified pharmaceutical distribution partners and AI-vetted suppliers"
+          title="Supply Chain Network"
+          subtitle="Verified orbital distribution partners and AI-vetted logistics nodes"
         />
         <button
-          className="btn d-flex align-items-center gap-2 rounded-pill px-4 py-2 fw-bold transition-all"
-          onClick={() => {
-            setFormData({ name: '', contact: '', email: '', phone: '', status: 'ACTIVE' });
-            setShowAddModal(true);
-          }}
-          style={{ 
-            background: '#00BFFF', 
-            color: '#111827',
-            border: 'none',
-            fontSize: '1rem',
-            boxShadow: '0 4px 12px rgba(0, 191, 255, 0.3)'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 191, 255, 0.5)'}
-          onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 191, 255, 0.3)'}
+          onClick={openAddModal}
+          className="btn btn-primary px-4 py-3 fw-black small text-uppercase tracking-widest rounded-3 shadow-lg"
         >
-          <Plus size={20} strokeWidth={3} />
-          <span>Add Supplier</span>
+          <Plus size={18} strokeWidth={3} className="me-2"/> Integrated New Partner
         </button>
       </div>
 
-      <div className="glass-card border-0">
+      <div className="glass-card overflow-hidden">
         <DataTable
           columns={columns}
           data={suppliers}
@@ -146,83 +157,54 @@ const SuppliersPage = () => {
         />
       </div>
 
-      {/* Add Supplier Modal */}
-      {showAddModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content glass-card border-0">
-              <div className="modal-header border-secondary border-opacity-10">
-                <h5 className="modal-title fw-bold neon-text">Add New Supplier</h5>
-                <button type="button" className="btn-close" onClick={() => setShowAddModal(false)}></button>
+      {/* Supplier Modal */}
+      {showModal && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 z-3 d-flex align-items-center justify-center p-3">
+           <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+           <div className="glass-card w-100 position-relative z-index-1 overflow-hidden shadow-lg" style={{ maxWidth: '500px' }}>
+              <div className="p-4 border-bottom d-flex justify-content-between align-items-center bg-light-subtle">
+                 <h3 className="fs-5 fw-black text-inherit fst-italic m-0">{editingSupplier ? 'EDIT PARTNER' : 'ADD PARTNER'}</h3>
+                 <button onClick={() => setShowModal(false)} className="btn btn-link text-muted p-0 text-decoration-none shadow-none">✕</button>
               </div>
-              <form onSubmit={handleCreateSupplier}>
-                <div className="modal-body py-4">
-                  <div className="mb-3">
-                    <label className="form-label small text-muted fw-bold">Supplier Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label small text-muted fw-bold">Primary Contact Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.contact}
-                      onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small text-muted fw-bold">Email</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                      />
+              <form onSubmit={handleSave} className="p-4 d-grid gap-4">
+                 {error && <div className="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger small fw-bold rounded-3">{error}</div>}
+                 
+                 <div className="d-grid gap-3">
+                    <div>
+                        <label className="small fw-black text-muted text-uppercase tracking-widest mb-2 d-block" style={{ fontSize: '10px' }}>Organization Name</label>
+                        <input type="text" className="form-control" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                     </div>
-                    <div className="col-md-6">
-                      <label className="form-label small text-muted fw-bold">Phone</label>
-                      <input
-                        type="tel"
-                        className="form-control"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        required
-                      />
+                    <div>
+                        <label className="small fw-black text-muted text-uppercase tracking-widest mb-2 d-block" style={{ fontSize: '10px' }}>Primary Contact</label>
+                        <input type="text" className="form-control" value={formData.contact} onChange={(e) => setFormData({ ...formData, contact: e.target.value })} />
                     </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label small text-muted fw-bold">Status</label>
-                    <select
-                      className="form-select"
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    >
-                      <option value="ACTIVE">Active</option>
-                      <option value="INACTIVE">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="modal-footer border-secondary border-opacity-10">
-                  <button type="button" className="btn btn-light" onClick={() => setShowAddModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-info text-white border-0 shadow-glow" style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)' }}>
-                    <Save size={16} className="me-2 d-inline-block" />
-                    Add Supplier
-                  </button>
-                </div>
+                    <div className="row g-2">
+                       <div className="col-12 col-md-6">
+                           <label className="small fw-black text-muted text-uppercase tracking-widest mb-2 d-block" style={{ fontSize: '10px' }}>Interface Email</label>
+                           <input type="email" className="form-control" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                       </div>
+                       <div className="col-12 col-md-6">
+                           <label className="small fw-black text-muted text-uppercase tracking-widest mb-2 d-block" style={{ fontSize: '10px' }}>Voice Line</label>
+                           <input type="tel" className="form-control" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                       </div>
+                    </div>
+                    <div>
+                        <label className="small fw-black text-muted text-uppercase tracking-widest mb-2 d-block" style={{ fontSize: '10px' }}>Node Status</label>
+                        <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+                          <option value="ACTIVE">ACTIVE</option>
+                          <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+                 </div>
+
+                 <div className="d-flex gap-3 pt-4 border-top">
+                    <button type="button" onClick={() => setShowModal(false)} className="btn btn-light-subtle flex-grow-1 py-3 fw-black text-uppercase tracking-widest" style={{ fontSize: '10px' }}>ABORT</button>
+                    <button type="submit" disabled={saving} className="btn btn-primary flex-grow-1 py-3 fw-black text-uppercase tracking-widest shadow-sm">
+                       {saving ? 'SYNCING...' : editingSupplier ? 'COMMIT UPDATES' : 'AUTHORIZE PARTNER'}
+                    </button>
+                 </div>
               </form>
-            </div>
-          </div>
+           </div>
         </div>
       )}
     </div>

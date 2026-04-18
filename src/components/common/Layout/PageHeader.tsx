@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 interface PageHeaderProps {
   title: string;
@@ -8,13 +8,19 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, actions }) => {
   return (
-    <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary border-opacity-25">
+    <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-5 border-bottom pb-4">
       <div>
-        <h1 className="h2 mb-0 fw-bold neon-text">{title}</h1>
-        {subtitle && <p className="text-muted small mb-0 mt-1 tracking-wide">{subtitle}</p>}
+        <h1 className="display-5 fw-black text-inherit tracking-tighter m-0 mb-2 fst-italic">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="small fw-bold text-muted lh-sm m-0" style={{ maxWidth: '600px' }}>
+            {subtitle}
+          </p>
+        )}
       </div>
       {actions && (
-        <div className="btn-toolbar mb-2 mb-md-0">
+        <div className="d-flex align-items-center gap-2">
           {actions}
         </div>
       )}

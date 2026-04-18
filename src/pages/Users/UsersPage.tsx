@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
-import { Search, Filter, ShieldCheck, Plus, Edit2, UserX, UserCheck, Save, X, Power } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, ShieldCheck, Plus, Edit2, Save, Power, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import api from '@/services/api';
 import PageHeader from '@/components/common/Layout/PageHeader';
 import DataTable from '@/components/common/Tables/DataTable';
@@ -11,11 +11,11 @@ const UsersPage = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'WAREHOUSE_STAFF', status: 'ACTIVE' });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -29,29 +29,90 @@ const UsersPage = () => {
     }
   };
 
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newUser = { id: Date.now(), ...formData };
-    setUsers([...users, newUser]);
-    setShowAddModal(false);
-    // Reset form
-    setFormData({ name: '', email: '', password: '', role: 'WAREHOUSE_STAFF', status: 'ACTIVE' });
+    setSaving(true);
+    setError('');
+    try {
+      await api.users.create({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      });
+      await fetchUsers();
+      setShowAddModal(false);
+      setFormData({ name: '', email: '', password: '', role: 'WAREHOUSE_STAFF', status: 'ACTIVE' });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data || 'Failed to create user.';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleUpdateUser = (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
-    setUsers(users.map(u => u.id === editingUser.id ? { ...u, name: formData.name, role: formData.role, status: formData.status } : u));
-    setEditingUser(null);
+    setSaving(true);
+    setError('');
+    try {
+      await api.users.update(editingUser.id, {
+        name: formData.name,
+        role: formData.role,
+        status: formData.status,
+      });
+      await fetchUsers();
+      setEditingUser(null);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data || 'Failed to update user.';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleInlineUpdate = (id: number, field: string, value: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, [field]: value } : u));
+  const handleToggleStatus = async (user: any) => {
+    const newStatus = user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await api.users.update(user.id, { status: newStatus });
+      setUsers(users.map(u => u.id === user.id ? { ...u, status: newStatus } : u));
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
+  };
+
+  const handleDeleteUser = async (user: any) => {
+    if (!confirm(`Delete user "${user.name}"?`)) return;
+    try {
+      await api.users.delete(user.id);
+      setUsers(users.filter(u => u.id !== user.id));
+    } catch (err) {
+      console.error('Failed to delete user', err);
+    }
+  };
+
+  const handleApprove = async (user: any) => {
+    try {
+      await api.users.approve(user.id);
+      await fetchUsers();
+    } catch (err) {
+      console.error('Failed to approve user', err);
+    }
+  };
+
+  const handleReject = async (user: any) => {
+    try {
+      await api.users.reject(user.id);
+      await fetchUsers();
+    } catch (err) {
+      console.error('Failed to reject user', err);
+    }
   };
 
   const filteredUsers = users.filter(user => {
     const term = searchTerm.toLowerCase();
-    const matchesSearch = user.name.toLowerCase().includes(term) || user.email.toLowerCase().includes(term);
+    const matchesSearch = (user.name || '').toLowerCase().includes(term) || (user.email || '').toLowerCase().includes(term);
     const matchesRole = roleFilter === '' || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
@@ -90,9 +151,13 @@ const UsersPage = () => {
             <span className="badge rounded-pill px-3 fw-bold" style={{ backgroundColor: '#E4F3ED', color: '#14805A', border: '1px solid #C4DFD3', padding: '6px 14px', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
               ACTIVE
             </span>
+          ) : user.status === 'PENDING' ? (
+            <span className="badge rounded-pill px-3 fw-bold" style={{ backgroundColor: '#FFF8E1', color: '#F59E0B', border: '1px solid #FDE68A', padding: '6px 14px', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+              PENDING
+            </span>
           ) : (
             <span className="badge rounded-pill px-3 fw-bold" style={{ backgroundColor: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA', padding: '6px 14px', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
-              INACTIVE
+              {user.status || 'INACTIVE'}
             </span>
           )}
         </div>
@@ -103,26 +168,56 @@ const UsersPage = () => {
       label: 'ACTIONS',
       align: 'end' as const,
       render: (user: any) => (
-        <div className="d-flex justify-content-end align-items-center gap-4">
-          <button
-            className={`btn rounded-circle d-flex align-items-center justify-content-center p-0 transition-all ${user.status === 'ACTIVE' ? 'text-white border-0' : 'bg-light text-secondary border border-secondary border-opacity-25'}`}
-            style={{ width: '32px', height: '32px', backgroundColor: user.status === 'ACTIVE' ? '#14805A' : '' }}
-            title={user.status === 'ACTIVE' ? 'Deactivate User' : 'Activate User'}
-            onClick={() => handleInlineUpdate(user.id, 'status', user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
-          >
-            <Power size={14} strokeWidth={2.5} />
-          </button>
-          
+        <div className="d-flex justify-content-end align-items-center gap-2">
+          {user.status === 'PENDING' && (
+            <>
+              <button
+                className="btn rounded-circle d-flex align-items-center justify-content-center p-0 border-0 text-white"
+                style={{ width: '32px', height: '32px', backgroundColor: '#14805A' }}
+                title="Approve User"
+                onClick={() => handleApprove(user)}
+              >
+                <CheckCircle size={16} strokeWidth={2.5} />
+              </button>
+              <button
+                className="btn rounded-circle d-flex align-items-center justify-content-center p-0 border-0 text-white"
+                style={{ width: '32px', height: '32px', backgroundColor: '#DC2626' }}
+                title="Reject User"
+                onClick={() => handleReject(user)}
+              >
+                <XCircle size={16} strokeWidth={2.5} />
+              </button>
+            </>
+          )}
+          {user.status !== 'PENDING' && (
+            <button
+              className={`btn rounded-circle d-flex align-items-center justify-content-center p-0 transition-all ${user.status === 'ACTIVE' ? 'text-white border-0' : 'bg-light text-secondary border border-secondary border-opacity-25'}`}
+              style={{ width: '32px', height: '32px', backgroundColor: user.status === 'ACTIVE' ? '#14805A' : '' }}
+              title={user.status === 'ACTIVE' ? 'Deactivate User' : 'Activate User'}
+              onClick={() => handleToggleStatus(user)}
+            >
+              <Power size={14} strokeWidth={2.5} />
+            </button>
+          )}
           <button
             className="btn rounded-1 d-flex align-items-center justify-content-center"
             style={{ backgroundColor: '#D9F3FA', color: '#00BFFF', border: 'none', width: '32px', height: '32px' }}
             title="Edit User"
             onClick={() => {
               setFormData({ name: user.name, email: user.email, password: '', role: user.role, status: user.status });
+              setError('');
               setEditingUser(user);
             }}
           >
             <Edit2 size={16} strokeWidth={2} />
+          </button>
+          <button
+            className="btn rounded-1 d-flex align-items-center justify-content-center"
+            style={{ backgroundColor: '#FEE2E2', color: '#DC2626', border: 'none', width: '32px', height: '32px' }}
+            title="Delete User"
+            onClick={() => handleDeleteUser(user)}
+          >
+            <Trash2 size={16} strokeWidth={2} />
           </button>
         </div>
       )
@@ -140,10 +235,11 @@ const UsersPage = () => {
           className="btn d-flex align-items-center gap-2 rounded-pill px-4 py-2 fw-bold transition-all"
           onClick={() => {
             setFormData({ name: '', email: '', password: '', role: 'WAREHOUSE_STAFF', status: 'ACTIVE' });
+            setError('');
             setShowAddModal(true);
           }}
-          style={{ 
-            background: '#00BFFF', 
+          style={{
+            background: '#00BFFF',
             color: '#111827',
             border: 'none',
             fontSize: '1rem',
@@ -210,6 +306,7 @@ const UsersPage = () => {
               </div>
               <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
                 <div className="modal-body py-4">
+                  {error && <div className="alert alert-danger py-2 small">{error}</div>}
                   <div className="mb-3">
                     <label className="form-label small text-muted fw-bold">Full Name</label>
                     <input
@@ -257,26 +354,28 @@ const UsersPage = () => {
                         <option value="WAREHOUSE_STAFF">Warehouse Staff</option>
                       </select>
                     </div>
-                    <div className="col-md-6">
-                      <label className="form-label small text-muted fw-bold">Status</label>
-                      <select
-                        className="form-select"
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      >
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
-                      </select>
-                    </div>
+                    {editingUser && (
+                      <div className="col-md-6">
+                        <label className="form-label small text-muted fw-bold">Status</label>
+                        <select
+                          className="form-select"
+                          value={formData.status}
+                          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        >
+                          <option value="ACTIVE">Active</option>
+                          <option value="INACTIVE">Inactive</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="modal-footer border-secondary border-opacity-10">
                   <button type="button" className="btn btn-light" onClick={() => { setShowAddModal(false); setEditingUser(null); }}>
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-info text-white border-0 shadow-glow" style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)' }}>
+                  <button type="submit" className="btn btn-info text-white border-0 shadow-glow" style={{ background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)' }} disabled={saving}>
                     <Save size={16} className="me-2 d-inline-block" />
-                    {editingUser ? 'Save Updates' : 'Create User'}
+                    {saving ? 'Saving...' : editingUser ? 'Save Updates' : 'Create User'}
                   </button>
                 </div>
               </form>
